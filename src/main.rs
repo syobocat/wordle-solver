@@ -16,10 +16,12 @@ fn main() {
     // 単語リストと探索用リストの生成
     let mut words = dictionary.clone();
     let mut filtering_table = dictionary;
+
+    // 探索用リストからは文字の重複をなくす
     filtering_table = filtering_table
         .into_iter()
         .filter(|x| x.chars().into_iter().collect::<HashSet<char>>().len() == 5)
-        .collect(); // 探索用リストからは文字の重複をなくす
+        .collect();
 
     // ステータス用変数
     let mut confirmed: Vec<char> = "_____".chars().collect(); // 緑
@@ -75,7 +77,7 @@ fn main() {
                     }
 
                     // 黄色と同じ位置に同じ文字を持つ単語を除外
-                    words = solve_yellow(&words, chars[i], i);
+                    words = words.into_iter().filter(|x| x.chars().collect::<Vec<char>>()[i] == chars[i]).map(|x| x.to_owned()).collect::<Vec<String>>();
                 }
                 _ => {
                     // 未探索だった黒をwithoutに
@@ -197,24 +199,6 @@ fn update_filtering_table(
 
         // 合格
         if is_valid {
-            match_words.push(word.to_owned());
-        }
-    }
-
-    match_words
-}
-
-// 黄色を処理
-fn solve_yellow(words: &[String], letter: char, position: usize) -> Vec<String> {
-    // 新単語リスト初期化
-    let mut match_words: Vec<String> = Vec::new();
-
-    // 単語リストを一つずつ見てまわる
-    for word in words {
-        // 黄色だった位置に黄色だった文字を含まない単語だけ新単語リストに入れる
-        if word.chars().collect::<Vec<char>>()[position] == letter {
-            continue;
-        } else {
             match_words.push(word.to_owned());
         }
     }
