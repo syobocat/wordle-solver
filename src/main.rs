@@ -18,7 +18,7 @@ fn main() {
     let mut filtering_table = dictionary;
     filtering_table = filtering_table
         .into_iter()
-        .filter(|x| x.chars().into_iter().collect::<HashSet<char>>().len() < 5)
+        .filter(|x| x.chars().into_iter().collect::<HashSet<char>>().len() == 5)
         .collect(); // 探索用リストからは文字の重複をなくす
 
     // ステータス用変数
