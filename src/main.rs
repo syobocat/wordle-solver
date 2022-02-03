@@ -31,12 +31,12 @@ fn main() {
     for _ in 0..6 {
         // ステータス表示
         println!("\n==Status==");
-        print!("Current: {}", confirmed.iter().cloned().collect::<String>());
+        print!("Current: {}", confirmed.iter().collect::<String>());
         if !with.is_empty() {
-            print!(" / with {}", with.iter().cloned().collect::<String>());
+            print!(" / with {}", with.iter().collect::<String>());
         }
         if !without.is_empty() {
-            print!(" / without {}", without.iter().cloned().collect::<String>());
+            print!(" / without {}", without.iter().collect::<String>());
         }
         println!();
         println!("Words remaining: {}", words.len());
@@ -51,7 +51,7 @@ fn main() {
         } else {
             attempt = choose(&words);
         }
-        let chars = attempt.chars().collect::<Vec<char>>();
+        let chars: Vec<char> = attempt.chars().collect();
 
         // ステータス表示終わり
         println!("==========");
@@ -77,7 +77,10 @@ fn main() {
                     }
 
                     // 黄色と同じ位置に同じ文字を持つ単語を除外
-                    words = words.into_iter().filter(|x| x.chars().collect::<Vec<char>>()[i] == chars[i]).map(|x| x.to_owned()).collect::<Vec<String>>();
+                    words = words
+                        .into_iter()
+                        .filter(|x| x.chars().collect::<Vec<char>>()[i] != chars[i])
+                        .collect();
                 }
                 _ => {
                     // 未探索だった黒をwithoutに
