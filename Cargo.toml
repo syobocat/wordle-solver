@@ -1,11 +1,11 @@
 [package]
 name = "wordle_solver"
 license = "MIT"
-description = "Solve wordle"
-repository = "https://github.com/syobon-tech/wordle-solver"
+description = "Solves wordle"
+repository = "https://github.com/syobocat/wordle-solver"
 version = "0.1.0"
-edition = "2021"
-authors = ["syobon <syobon@vivaldi.net>"]
+edition = "2024"
+authors = ["syobon <syobon@syobon.net>"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
