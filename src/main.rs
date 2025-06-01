@@ -1,4 +1,3 @@
-use rand::seq::IndexedRandom;
 use std::collections::HashSet;
 use std::fs;
 
@@ -58,9 +57,9 @@ fn main() {
         // 候補が1つだけ、もしくは未探索文字で単語が作れない場合は候補からランダムに
         let attempt = if !filtering_table.is_empty() && words.len() > 1 {
             println!("Too many words remaining. Trying to reduce the number of words...");
-            filtering_table.choose(&mut rand::rng()).unwrap()
+            filtering_table[0]
         } else {
-            words.choose(&mut rand::rng()).unwrap()
+            words[0]
         };
         let chars: Vec<char> = attempt.chars().collect();
 
