@@ -26,7 +26,7 @@ const DIC_PATH: &str = "./dictionary.txt";
 fn main() {
     // 辞書ファイルのロード
     let contents = fs::read_to_string(DIC_PATH).expect("Dictionary not found");
-    let dictionary: Vec<String> = contents.split_whitespace().map(|x| x.to_owned()).collect();
+    let dictionary: Vec<&str> = contents.lines().collect();
 
     // 単語リストと探索用リストの生成
     let mut words = dictionary.clone();
