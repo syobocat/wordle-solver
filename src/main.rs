@@ -80,10 +80,7 @@ fn main() {
         // ステータス更新
         for i in 0..5 {
             // 未探索のみ
-            if !confirmed.contains(&chars[i])
-                && !with.contains(&chars[i])
-                && !without.contains(&chars[i])
-            {
+            if !confirmed.contains(&chars[i]) && !without.contains(&chars[i]) {
                 match result[i] {
                     Response::Green => {
                         confirmed[i] = chars[i]; // 緑をconfirmedに
