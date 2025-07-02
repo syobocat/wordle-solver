@@ -6,8 +6,8 @@ repository = "https://github.com/syobocat/wordle-solver"
 version = "0.1.0"
 edition = "2024"
 authors = ["syobon <syobon@syobon.net>"]
+default-run = "wordle_solver"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rand = "0.9.1"
