@@ -54,7 +54,7 @@ fn main() {
 
         // 単語生成
         // 候補が2つ以上あり、未探索文字だけで単語が作れる場合はそれを優先
-        // 候補が1つだけ、もしくは未探索文字で単語が作れない場合は候補からランダムに
+        // 候補が1つだけ、もしくは未探索文字で単語が作れない場合は先頭の候補を選択
         let attempt = if !filtering_table.is_empty() && words.len() > 1 {
             println!("Too many words remaining. Trying to reduce the number of words...");
             filtering_table[0]
