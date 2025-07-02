@@ -5,6 +5,7 @@ use std::{
 };
 
 const DIC_PATH_READ: &str = "./dictionary_raw.txt";
+//const DIC_PATH_READ: &str = "./dictionary_unlimited.txt";
 const DIC_PATH_WRITE: &str = "./dictionary.txt";
 
 fn analyze_freq(words: &Vec<[char; 5]>) -> [HashMap<char, u32>; 5] {
