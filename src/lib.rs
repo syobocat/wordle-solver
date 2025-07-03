@@ -5,9 +5,10 @@ use std::{
 
 use anyhow::Context;
 
+#[cfg(test)]
+mod test;
+
 pub struct WordleSolver {
-    finished: bool,
-    attempt: u8,
     answer_list: Vec<[char; 5]>,
     filter_list: Vec<[char; 5]>,
     confirmed: [char; 5],
@@ -26,8 +27,6 @@ impl WordleSolver {
             .filter(|l| l.iter().collect::<HashSet<&char>>().len() == 5)
             .collect();
         Ok(Self {
-            finished: false,
-            attempt: 1,
             answer_list,
             filter_list,
             confirmed: ['_'; 5],
@@ -36,37 +35,13 @@ impl WordleSolver {
         })
     }
 
-    pub fn try_solve(mut self) -> WordleResult {
-        loop {
-            self.attempt();
-            if let Some(success) = self.is_successed() {
-                if success {
-                    return WordleResult::Done;
-                } else {
-                    return WordleResult::Failed(self.answer_list);
-                }
-            }
-        }
+    pub fn remaining_answers(self) -> Vec<[char; 5]> {
+        self.answer_list
     }
 
-    fn is_successed(&self) -> Option<bool> {
-        if self.finished {
-            Some(true)
-        } else if self.attempt > 6 {
-            Some(false)
-        } else {
-            None
-        }
-    }
-
-    fn attempt(&mut self) {
-        self.print();
-        let guess = self.guess();
-        println!("==========");
-        println!("{}", guess.iter().collect::<String>());
-        let response = read_line();
+    pub fn feedback(&mut self, guess: [char; 5], response: [Response; 5]) -> bool {
         if response.iter().all(|r| r == &Response::Green) {
-            self.finished = true;
+            return true;
         }
         for i in 0..5 {
             match response[i] {
@@ -81,10 +56,10 @@ impl WordleSolver {
                 }
             }
         }
-        self.attempt += 1;
+        false
     }
 
-    fn print(&self) {
+    pub fn print(&self) {
         println!("\n==Status==");
         print!("Current: {}", self.confirmed.iter().collect::<String>());
         if !self.with.is_empty() {
@@ -97,11 +72,10 @@ impl WordleSolver {
         println!("Words remaining: {}", self.answer_list.len());
     }
 
-    fn guess(&mut self) -> [char; 5] {
+    pub fn guess(&mut self) -> [char; 5] {
         if self.answer_list.len() <= 2 {
             self.answer_list[0]
         } else {
-            println!("Too many words remaining. Trying to reduce the number of words...");
             self.rearrange_filter_list();
             self.filter_list[0]
         }
@@ -158,13 +132,8 @@ impl WordleSolver {
     }
 }
 
-pub enum WordleResult {
-    Done,
-    Failed(Vec<[char; 5]>),
-}
-
 #[derive(PartialEq)]
-enum Response {
+pub enum Response {
     Black,
     Yellow,
     Green,
@@ -179,24 +148,6 @@ impl TryFrom<char> for Response {
             '1' => Ok(Self::Yellow),
             '2' => Ok(Self::Green),
             _ => Err(()),
-        }
-    }
-}
-
-fn read_line() -> [Response; 5] {
-    loop {
-        let mut input = String::new();
-        std::io::stdin().read_line(&mut input).expect("IO Error.");
-        let res: Vec<_> = input
-            .trim()
-            .chars()
-            .filter_map(|i| i.try_into().ok())
-            .collect();
-
-        if let Ok(res) = res.try_into() {
-            return res;
-        } else {
-            println!("Invalid input.");
         }
     }
 }
