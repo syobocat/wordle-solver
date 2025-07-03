@@ -17,15 +17,20 @@ pub struct WordleSolver {
 }
 
 impl WordleSolver {
-    pub fn new<P: AsRef<Path>>(path: P) -> anyhow::Result<Self> {
-        let contents = std::fs::read_to_string(path).context("Dictionary not found")?;
-        let dictionary = contents.lines().map(|l| l.chars().collect::<Vec<char>>());
-        let answer_list: Vec<[char; 5]> = dictionary.filter_map(|l| l.try_into().ok()).collect();
-        let filter_list: Vec<[char; 5]> = answer_list
-            .clone()
-            .into_iter()
-            .filter(|l| l.iter().collect::<HashSet<&char>>().len() == 5)
+    pub fn new<P: AsRef<Path>>(answer_dict_path: P, input_dict_path: P) -> anyhow::Result<Self> {
+        let contents = std::fs::read_to_string(input_dict_path).context("Dictionary not found")?;
+        let filter_list: Vec<[char; 5]> = contents
+            .lines()
+            .filter(|l| l.chars().collect::<HashSet<char>>().len() == 5)
+            .filter_map(|l| l.chars().collect::<Vec<char>>().try_into().ok())
             .collect();
+
+        let contents = std::fs::read_to_string(answer_dict_path).context("Dictionary not found")?;
+        let answer_list: Vec<[char; 5]> = contents
+            .lines()
+            .filter_map(|l| l.chars().collect::<Vec<char>>().try_into().ok())
+            .collect();
+
         Ok(Self {
             answer_list,
             filter_list,

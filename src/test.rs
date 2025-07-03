@@ -1,10 +1,11 @@
 use super::*;
 
-const ANSWER_PATH: &str = "past_answers.txt";
+const PAST_ANSWERS_PATH: &str = "past_answers.txt";
+const ANSWERS_PATH: &str = "./possible_answers.txt";
 const DIC_PATH: &str = "dictionary.txt";
 
 fn solve(word: &str) -> Option<u32> {
-    let mut solver = WordleSolver::new(DIC_PATH).unwrap();
+    let mut solver = WordleSolver::new(ANSWERS_PATH, DIC_PATH).unwrap();
     for i in 1..=6 {
         let guess = solver.guess();
         let response: [Response; 5] = std::array::from_fn(|i| {
@@ -30,7 +31,7 @@ fn success_rate() {
     let mut steps = 0u32;
     let mut success = 0u32;
     let mut fail = 0u32;
-    let contents = std::fs::read_to_string(ANSWER_PATH).unwrap();
+    let contents = std::fs::read_to_string(PAST_ANSWERS_PATH).unwrap();
     for word in contents.lines() {
         if let Some(i) = solve(word) {
             success += 1;

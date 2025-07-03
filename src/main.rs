@@ -1,9 +1,10 @@
 use wordle_solver::{Response, WordleSolver};
 
 const DIC_PATH: &str = "./dictionary.txt";
+const ANSWERS_PATH: &str = "./possible_answers.txt";
 
 fn main() {
-    let mut solver = WordleSolver::new(DIC_PATH).unwrap();
+    let mut solver = WordleSolver::new(ANSWERS_PATH, DIC_PATH).unwrap();
 
     for _ in 0..6 {
         solver.print();
