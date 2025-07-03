@@ -84,10 +84,6 @@ impl WordleSolver {
         self.attempt += 1;
     }
 
-    pub fn remaining_words(&self) -> &Vec<[char; 5]> {
-        &self.answer_list
-    }
-
     fn print(&self) {
         println!("\n==Status==");
         print!("Current: {}", self.confirmed.iter().collect::<String>());
