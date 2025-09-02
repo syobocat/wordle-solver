@@ -1,6 +1,6 @@
 use wordle_solver::{Response, WordleSolver};
 
-const DIC_PATH: &str = "./dictionary.txt";
+const DIC_PATH: &str = "./dictionaries/wordle.txt";
 
 fn main() {
     let mut solver = WordleSolver::new(DIC_PATH).unwrap();
