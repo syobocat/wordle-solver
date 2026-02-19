@@ -11,10 +11,10 @@ fn main() {
         let guess = solver.guess();
         println!("{}", guess.iter().collect::<String>());
         let response = read_line();
-        if solver.feedback(guess, response) {
+        if solver.feedback(guess, &response) {
             println!("Finished!");
             return;
-        };
+        }
     }
 
     // 6トライで当てられなかった場合、残った単語を表示
@@ -37,8 +37,7 @@ fn read_line() -> [Response; 5] {
 
         if let Ok(res) = res.try_into() {
             return res;
-        } else {
-            println!("Invalid input.");
         }
+        println!("Invalid input.");
     }
 }
