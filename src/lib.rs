@@ -1,7 +1,4 @@
-use std::{
-    collections::{HashMap, HashSet},
-    path::Path,
-};
+use std::{collections::HashSet, path::Path};
 
 use anyhow::Context;
 
@@ -97,37 +94,43 @@ impl WordleSolver {
     }
 
     fn rearrange_filter_list(&mut self) {
-        let mut freq: HashMap<char, u32> = HashMap::new();
-        let mut freq_per_pos: [HashMap<char, u32>; 5] = std::array::from_fn(|_| HashMap::new());
+        let mut scores: [[f64; 26]; 5] = [[0.0; 26]; 5];
+
         for i in 0..5 {
-            if self.confirmed[i] != '_' {
-                continue;
-            }
-            for word in self.answer_list.iter() {
-                freq.entry(word[i]).and_modify(|c| *c += 1).or_insert(1);
-                freq_per_pos[i]
-                    .entry(word[i])
-                    .and_modify(|c| *c += 1)
-                    .or_insert(1);
+            for c in 'a'..='z' {
+                let mut green = 0;
+                let mut yellow = 0;
+                let mut gray = 0;
+                for word in self.answer_list.iter() {
+                    if word.contains(&c) {
+                        if word[i] == c {
+                            green += 1;
+                        } else {
+                            yellow += 1;
+                        }
+                    } else {
+                        gray += 1;
+                    }
+                }
+
+                // 残る単語数の期待値
+                let score =
+                    ((green as f64).powi(2) + (yellow as f64).powi(2) + (gray as f64).powi(2))
+                        / self.answer_list.len() as f64;
+
+                scores[i][c as usize - 'a' as usize] = score;
             }
         }
 
-        let mut ranked: Vec<([char; 5], u32)> = Vec::new();
+        let mut ranked: Vec<([char; 5], f64)> = Vec::new();
         for word in self.filter_list.iter() {
-            let score = word.iter().enumerate().fold(0, |score, (i, x)| {
-                // 確定してる情報は避ける
-                if &self.confirmed[i] == x {
-                    score
-                } else {
-                    // 全体の頻度に加え、その位置での頻度を加味する
-                    score + freq.get(&x).unwrap_or(&0) + freq_per_pos[i].get(&x).unwrap_or(&0)
-                }
+            let score = word.iter().enumerate().fold(0.0, |score, (i, x)| {
+                score + scores[i][*x as usize - 'a' as usize]
             });
             ranked.push((*word, score));
         }
 
-        ranked.retain(|x| x.1 > 0);
-        ranked.sort_unstable_by(|a, b| b.1.cmp(&a.1));
+        ranked.sort_unstable_by(|a, b| a.1.total_cmp(&b.1));
         self.filter_list = ranked.into_iter().map(|x| x.0).collect();
     }
 }
