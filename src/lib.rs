@@ -1,7 +1,4 @@
-use std::{
-    collections::{HashMap, HashSet},
-    path::Path,
-};
+use std::{collections::HashSet, path::Path};
 
 use anyhow::Context;
 
@@ -97,7 +94,7 @@ impl WordleSolver {
     }
 
     fn rearrange_filter_list(&mut self) {
-        let mut scores: [HashMap<char, f64>; 5] = std::array::from_fn(|_| HashMap::new());
+        let mut scores: [[f64; 26]; 5] = [[0.0; 26]; 5];
 
         for i in 0..5 {
             for c in 'a'..='z' {
@@ -121,16 +118,15 @@ impl WordleSolver {
                     ((green as f64).powi(2) + (yellow as f64).powi(2) + (gray as f64).powi(2))
                         / self.answer_list.len() as f64;
 
-                scores[i].insert(c, score);
+                scores[i][c as usize - 'a' as usize] = score;
             }
         }
 
         let mut ranked: Vec<([char; 5], f64)> = Vec::new();
         for word in self.filter_list.iter() {
-            let score = word
-                .iter()
-                .enumerate()
-                .fold(0.0, |score, (i, x)| score + scores[i].get(x).unwrap());
+            let score = word.iter().enumerate().fold(0.0, |score, (i, x)| {
+                score + scores[i][*x as usize - 'a' as usize]
+            });
             ranked.push((*word, score));
         }
 
