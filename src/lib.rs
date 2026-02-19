@@ -36,7 +36,7 @@ impl WordleSolver {
         self.answer_list
     }
 
-    pub fn feedback(&mut self, guess: [char; 5], response: [Response; 5]) -> bool {
+    pub fn feedback(&mut self, guess: [char; 5], response: &[Response; 5]) -> bool {
         if response.iter().all(|r| r == &Response::Green) {
             return true;
         }
@@ -101,7 +101,7 @@ impl WordleSolver {
                 let mut green = 0;
                 let mut yellow = 0;
                 let mut gray = 0;
-                for word in self.answer_list.iter() {
+                for word in &self.answer_list {
                     if word.contains(&c) {
                         if word[i] == c {
                             green += 1;
@@ -114,16 +114,17 @@ impl WordleSolver {
                 }
 
                 // 残る単語数の期待値
-                let score =
-                    ((green as f64).powi(2) + (yellow as f64).powi(2) + (gray as f64).powi(2))
-                        / self.answer_list.len() as f64;
+                let score = f64::from(green).mul_add(
+                    f64::from(green),
+                    f64::from(yellow).mul_add(f64::from(yellow), f64::from(gray).powi(2)),
+                ) / self.answer_list.len() as f64;
 
                 scores[i][c as usize - 'a' as usize] = score;
             }
         }
 
         let mut ranked: Vec<([char; 5], f64)> = Vec::new();
-        for word in self.filter_list.iter() {
+        for word in &self.filter_list {
             let score = word.iter().enumerate().fold(0.0, |score, (i, x)| {
                 score + scores[i][*x as usize - 'a' as usize]
             });

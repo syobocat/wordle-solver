@@ -16,7 +16,7 @@ fn solve(word: &str) -> Option<u32> {
                 Response::Black
             }
         });
-        if solver.feedback(guess, response) {
+        if solver.feedback(guess, &response) {
             println!("{word}: Success in {i} steps");
             return Some(i);
         };
