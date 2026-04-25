@@ -1,4 +1,7 @@
-use std::{collections::HashSet, path::Path};
+use std::{
+    collections::{HashMap, HashSet},
+    path::Path,
+};
 
 use anyhow::Context;
 
@@ -21,7 +24,7 @@ impl WordleSolver {
         let filter_list: Vec<[char; 5]> = answer_list
             .clone()
             .into_iter()
-            .filter(|l| l.iter().collect::<HashSet<&char>>().len() == 5)
+            .filter(|word| word.iter().collect::<HashSet<&char>>().len() == 5)
             .collect();
         Ok(Self {
             answer_list,
@@ -73,8 +76,7 @@ impl WordleSolver {
         if self.answer_list.len() <= 2 {
             self.answer_list[0]
         } else {
-            self.rearrange_filter_list();
-            self.filter_list[0]
+            self.next().unwrap_or(self.answer_list[0])
         }
     }
 
@@ -93,17 +95,23 @@ impl WordleSolver {
         self.answer_list.retain(|x| !x.contains(&c));
     }
 
-    fn rearrange_filter_list(&mut self) {
-        let mut scores: [[f64; 26]; 5] = [[0.0; 26]; 5];
+    fn next(&mut self) -> Option<[char; 5]> {
+        let mut chars: HashSet<char> = HashSet::new();
+        for word in &self.filter_list {
+            for i in 0..5 {
+                let _ = chars.insert(word[i]);
+            }
+        }
 
+        let mut scores: [HashMap<char, f64>; 5] = std::array::from_fn(|_| HashMap::new());
         for i in 0..5 {
-            for c in 'a'..='z' {
+            for c in chars.iter() {
                 let mut green = 0;
                 let mut yellow = 0;
                 let mut gray = 0;
                 for word in &self.answer_list {
                     if word.contains(&c) {
-                        if word[i] == c {
+                        if word[i] == *c {
                             green += 1;
                         } else {
                             yellow += 1;
@@ -119,20 +127,25 @@ impl WordleSolver {
                     f64::from(yellow).mul_add(f64::from(yellow), f64::from(gray).powi(2)),
                 ) / self.answer_list.len() as f64;
 
-                scores[i][c as usize - 'a' as usize] = score;
+                let _ = scores[i].insert(*c, score);
             }
         }
 
         let mut ranked: Vec<([char; 5], f64)> = Vec::new();
         for word in &self.filter_list {
-            let score = word.iter().enumerate().fold(0.0, |score, (i, x)| {
-                score + scores[i][*x as usize - 'a' as usize]
-            });
+            let score = word
+                .iter()
+                .enumerate()
+                .fold(0.0, |score, (i, x)| score + scores[i].get(x).unwrap());
+            // if score > 0.0 {
             ranked.push((*word, score));
+            // }
         }
 
-        ranked.sort_unstable_by(|a, b| a.1.total_cmp(&b.1));
-        self.filter_list = ranked.into_iter().map(|x| x.0).collect();
+        ranked
+            .iter()
+            .min_by(|(_, a), (_, b)| a.total_cmp(&b))
+            .map(|(word, _)| *word)
     }
 }
 
