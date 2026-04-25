@@ -99,11 +99,11 @@ impl WordleSolver {
         self.answer_list.retain(|x| !x.contains(&c));
     }
 
-    fn next(&mut self) -> Option<[char; 5]> {
+    fn next(&self) -> Option<[char; 5]> {
         let mut chars: HashSet<char> = HashSet::new();
         for word in &self.filter_list {
-            for i in 0..5 {
-                let _ = chars.insert(word[i]);
+            for c in word {
+                let _ = chars.insert(*c);
             }
         }
 
@@ -114,7 +114,7 @@ impl WordleSolver {
                 let mut yellow = 0;
                 let mut gray = 0;
                 for word in &self.answer_list {
-                    if word.contains(&c) {
+                    if word.contains(c) {
                         if word[i] == *c {
                             green += 1;
                         } else {
@@ -148,7 +148,7 @@ impl WordleSolver {
 
         ranked
             .iter()
-            .min_by(|(_, a), (_, b)| a.total_cmp(&b))
+            .min_by(|(_, a), (_, b)| a.total_cmp(b))
             .map(|(word, _)| *word)
     }
 }
