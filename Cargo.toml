@@ -11,3 +11,4 @@ authors = ["syobon <syobon@syobon.net>"]
 
 [dependencies]
 anyhow = "1.0.98"
+clap = { version = "4.6.1", features = ["derive"] }

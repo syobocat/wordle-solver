@@ -17,9 +17,8 @@ pub struct WordleSolver {
 }
 
 impl WordleSolver {
-    pub fn new<P: AsRef<Path>>(path: P) -> anyhow::Result<Self> {
-        let contents = std::fs::read_to_string(path).context("Dictionary not found")?;
-        let dictionary = contents.lines().map(|l| l.chars().collect::<Vec<char>>());
+    pub fn new(dict: &str) -> anyhow::Result<Self> {
+        let dictionary = dict.lines().map(|l| l.chars().collect::<Vec<char>>());
         let answer_list: Vec<[char; 5]> = dictionary.filter_map(|l| l.try_into().ok()).collect();
         let filter_list: Vec<[char; 5]> = answer_list
             .clone()
@@ -33,6 +32,11 @@ impl WordleSolver {
             with: HashSet::new(),
             without: HashSet::new(),
         })
+    }
+
+    pub fn from_path<P: AsRef<Path>>(path: P) -> anyhow::Result<Self> {
+        let contents = std::fs::read_to_string(path).context("Dictionary not found")?;
+        Self::new(&contents)
     }
 
     pub fn remaining_answers(self) -> Vec<[char; 5]> {

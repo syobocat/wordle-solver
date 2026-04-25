@@ -1,9 +1,30 @@
+use clap::{Parser, ValueEnum};
 use wordle_solver::{Response, WordleSolver};
 
-const DIC_PATH: &str = "./dictionaries/wordle.txt";
+const WORDLE_DICT: &str = include_str!("../dictionaries/wordle.txt");
+const UNLIMITED_DICT: &str = include_str!("../dictionaries/wordle_unlimited.txt");
+const POKEMON_DICT: &str = include_str!("../dictionaries/pokemon.txt");
+
+#[derive(Clone, ValueEnum)]
+enum Mode {
+    Wordle,
+    Unlimited,
+    Pokemon,
+}
+
+#[derive(Parser)]
+struct App {
+    #[arg(value_enum, default_value_t = Mode::Wordle)]
+    mode: Mode,
+}
 
 fn main() {
-    let mut solver = WordleSolver::new(DIC_PATH).unwrap();
+    let app = App::parse();
+    let mut solver = match app.mode {
+        Mode::Wordle => WordleSolver::new(WORDLE_DICT).unwrap(),
+        Mode::Unlimited => WordleSolver::new(UNLIMITED_DICT).unwrap(),
+        Mode::Pokemon => WordleSolver::new(POKEMON_DICT).unwrap(),
+    };
 
     for _ in 0..6 {
         solver.print();
